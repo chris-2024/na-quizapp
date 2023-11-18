@@ -1,23 +1,30 @@
-﻿namespace QuizApp;
+﻿using QuizApp.Menus;
+using QuizApp.Services;
+
+namespace QuizApp;
 
 internal class Application
 {
-    public Application()
+    private readonly IMenuService _menuService;
+    private readonly LoginMenu _loginMenu;
+    private readonly MainMenu _mainMenu;
+
+    public Application(IMenuService menuService, LoginMenu loginMenu, MainMenu mainMenu)
     {
-        
+        _menuService = menuService;
+        _loginMenu = loginMenu;
+        _mainMenu = mainMenu;
     }
 
     public async Task Run()
     {
         do
         {
+            await _loginMenu.ShowAsync();
+            await _mainMenu.ShowAsync();
 
-            await Console.Out.WriteLineAsync("App running...");
+        } while (!_menuService.ExitApp);
 
-            var b = Console.ReadKey().KeyChar;
-
-            if (b == 'e') break;
-
-        } while (true);
+        Console.WriteLine("Exiting...");
     }
 }

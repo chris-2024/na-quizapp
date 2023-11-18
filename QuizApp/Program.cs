@@ -1,27 +1,33 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using QuizApp.Menus;
+using QuizApp.Services;
 
-namespace QuizApp
+namespace QuizApp;
+
+internal class Program
 {
-    internal class Program
+    static async Task Main(string[] args)
     {
-        static async Task Main(string[] args)
-        {
-            var serviceProvider = new ServiceCollection()
-            .AddScoped<Application>()
-            // Menus
+        var serviceProvider = new ServiceCollection()
+        .AddScoped<Application>()
+        // Menus
+        .AddScoped<LoginMenu>()
+        .AddScoped<MainMenu>()
+        .AddScoped<UserMenu>()
+        .AddScoped<QuizMenu>()
+        // Services
+        .AddScoped<IMenuService, MenuService>()
+        .AddScoped<LoginService>()
+        .AddScoped<QuizService>()
+        // Repositories
 
-            // Services
+        // Build
+        .BuildServiceProvider();
 
-            // Repositories
+        // Get application
+        var app = serviceProvider.GetRequiredService<Application>();
 
-            // Build
-            .BuildServiceProvider();
-
-            // Get application
-            var app = serviceProvider.GetRequiredService<Application>();
-
-            // Run application
-            await app.Run();
-        }
+        // Run application
+        await app.Run();
     }
 }
