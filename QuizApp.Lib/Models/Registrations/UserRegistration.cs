@@ -1,4 +1,5 @@
-﻿using QuizApp.Lib.Models.Entities;
+﻿using QuizApp.Lib.Enums;
+using QuizApp.Lib.Models.Entities;
 
 namespace QuizApp.Lib.Models.Registrations;
 

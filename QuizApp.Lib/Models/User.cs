@@ -1,4 +1,5 @@
-﻿using QuizApp.Lib.Models.Entities;
+﻿using QuizApp.Lib.Enums;
+using QuizApp.Lib.Models.Entities;
 
 namespace QuizApp.Lib.Models;
 
@@ -15,11 +16,4 @@ public class User
             UserRole = (UserRole)user.UserRoleID
         };
     }
-}
-
-public enum UserRole
-{
-    None,
-    Registered,
-    Guest
 }

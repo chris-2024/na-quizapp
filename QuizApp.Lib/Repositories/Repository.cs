@@ -4,7 +4,7 @@ using System.Linq.Expressions;
 
 namespace QuizApp.Lib.Repositories;
 
-public class Repository<TEntity> : IRepository<TEntity> where TEntity : class
+internal abstract class Repository<TEntity> : IRepository<TEntity> where TEntity : class
 {
     private readonly DbContext _context;
     private readonly DbSet<TEntity> _dbSet;

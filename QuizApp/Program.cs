@@ -1,4 +1,6 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
+using QuizApp.Lib.Contexts;
 using QuizApp.Menus;
 using QuizApp.Services;
 using System.Configuration;
@@ -11,21 +13,24 @@ internal class Program
 
     static async Task Main(string[] args)
     {
-        var serviceProvider = new ServiceCollection()
-        .AddScoped<Application>()
+        var services = new ServiceCollection();
+        // Register DbContext
+        services.AddDbContext<DataContext>(options => options.UseSqlServer(_connectionString));
+        // App
+        services.AddScoped<Application>();
         // Menus
-        .AddScoped<LoginMenu>()
-        .AddScoped<MainMenu>()
-        .AddScoped<UserMenu>()
-        .AddScoped<QuizMenu>()
+        services.AddScoped<LoginMenu>();
+        services.AddScoped<MainMenu>();
+        services.AddScoped<UserMenu>();
+        services.AddScoped<QuizMenu>();
         // Services
-        .AddScoped<IMenuService, MenuService>()
-        .AddScoped<LoginService>()
-        .AddScoped<QuizService>()
+        services.AddScoped<IMenuService, MenuService>();
+        services.AddScoped<LoginService>();
+        services.AddScoped<QuizService>();
         // Repositories
 
         // Build
-        .BuildServiceProvider();
+        var serviceProvider = services.BuildServiceProvider();
 
         // Get application
         var app = serviceProvider.GetRequiredService<Application>();

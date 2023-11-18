@@ -21,7 +21,7 @@ internal class QuizMenu : IMenu
         while (true) 
         { 
             _menuService.CurrentMenu = MenuType.QuizMenu;
-
+            await Console.Out.WriteLineAsync();
             Console.Clear();
 
             _menuService.PrintMenuItems(_quizService.QuizOptions());
