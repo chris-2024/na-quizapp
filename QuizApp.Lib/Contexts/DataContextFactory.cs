@@ -1,12 +1,11 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
-using System.Configuration;
 
 namespace QuizApp.Lib.Contexts;
 
 internal class DataContextFactory : IDesignTimeDbContextFactory<DataContext>
 {
-    private static readonly string _connectionString = ConfigurationManager.ConnectionStrings[0].ConnectionString;
+    private readonly string _connectionString = @"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=D:\Code\QuizApp\QuizApp.Lib\Contexts\quizapp_localdb.mdf;Integrated Security=True;Connect Timeout=30";
 
     public DataContext CreateDbContext(string[] args)
     {

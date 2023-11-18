@@ -9,7 +9,7 @@ namespace QuizApp;
 
 internal class Program
 {
-    private static readonly string _connectionString = ConfigurationManager.ConnectionStrings[0].ConnectionString;
+    private static readonly string _connectionString = @"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=D:\Code\QuizApp\QuizApp.Lib\Contexts\quizapp_localdb.mdf;Integrated Security=True;Connect Timeout=30";
 
     static async Task Main(string[] args)
     {
