@@ -1,4 +1,6 @@
 ﻿using QuizApp.Enums;
+using QuizApp.Lib.Enums;
+using QuizApp.Lib.Services;
 using QuizApp.Services;
 
 namespace QuizApp.Menus;
@@ -6,12 +8,14 @@ namespace QuizApp.Menus;
 internal class MainMenu : IMenu
 {
     private readonly IMenuService _menuService;
+    private readonly IUserService _userService;
     private readonly UserMenu _userMenu;
     private readonly QuizMenu _quizMenu;
 
-    public MainMenu(IMenuService menuService, UserMenu userMenu, QuizMenu quizMenu)
+    public MainMenu(IMenuService menuService, IUserService userService, UserMenu userMenu, QuizMenu quizMenu)
     {
         _menuService = menuService;
+        _userService = userService;
         _userMenu = userMenu;
         _quizMenu = quizMenu;
     }
@@ -26,7 +30,13 @@ internal class MainMenu : IMenu
 
             Console.Clear();
 
-            string loginLogoutOption = false ? "Logout" : "Login";
+            if (_userService.CurrentUser == null)
+            {
+                Console.WriteLine("Failed to establish User");
+                _menuService.ExitApp = true;
+            }
+
+            string loginLogoutOption = _userService.CurrentUser!.UserRole is UserRole.Registered ? "Logout" : "Login";
             _menuService.PrintMenuItems(_quizMenu.Title, _userMenu.Title, "Scoreboard", loginLogoutOption);
 
             if (await MenuSelection(_menuService.GetCharInput()))
@@ -62,8 +72,22 @@ internal class MainMenu : IMenu
     private async Task ShowScores()
     {
         Console.Clear();
-        await Console.Out.WriteLineAsync("1. ScoreOne");
-        await Console.Out.WriteLineAsync("2. ScoreTwo");
+
+        var scores = await _userService.GetAllUserScores();
+
+        if (scores == null || scores.Count() <= 0)
+            Console.WriteLine("No Scores");
+        else
+        {
+            var sortedScores = scores.OrderByDescending(s => s.CorrectAnswers).ToList();
+
+            for (int i = 0; i < sortedScores!.Count; i++)
+            {
+                Console.WriteLine($"#{i + 1} {sortedScores[i].User.Username} - {sortedScores[i].CorrectAnswers}");
+            }
+
+        }
+
         Console.ReadKey();
     }
 }

@@ -1,9 +1,10 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using QuizApp.Lib.Contexts;
+using QuizApp.Lib.Repositories;
+using QuizApp.Lib.Services;
 using QuizApp.Menus;
 using QuizApp.Services;
-using System.Configuration;
 
 namespace QuizApp;
 
@@ -14,7 +15,7 @@ internal class Program
     static async Task Main(string[] args)
     {
         var services = new ServiceCollection();
-        // Register DbContext
+        // DbContext
         services.AddDbContext<DataContext>(options => options.UseSqlServer(_connectionString));
         // App
         services.AddScoped<Application>();
@@ -26,8 +27,13 @@ internal class Program
         // Services
         services.AddScoped<IMenuService, MenuService>();
         services.AddScoped<LoginService>();
-        services.AddScoped<QuizService>();
+        services.AddScoped<IQuizService, QuizService>();
+        services.AddScoped<IUserService, UserService>();
         // Repositories
+        services.AddScoped<IUserRepository, UserRepository>();
+        services.AddScoped<IUserQuestionHistoryRepository, UserQuestionHistoryRepository>();
+        services.AddScoped<IUserScoreRepository, UserScoreRepository>();
+        services.AddScoped<IQuestionRepository, QuestionRepository>();
 
         // Build
         var serviceProvider = services.BuildServiceProvider();

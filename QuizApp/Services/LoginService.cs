@@ -1,24 +1,29 @@
-﻿namespace QuizApp.Services;
+﻿using QuizApp.Lib.Enums;
+using QuizApp.Lib.Services;
+
+namespace QuizApp.Services;
 
 internal class LoginService
 {
-    public LoginService()
+    private readonly IUserService _userService;
+
+    public LoginService(IUserService userService)
     {
-        
+        _userService = userService;
     }
 
-    public async Task LoginUser(string userName, string password)
+    public async Task<bool> LoginUser(string userName, string password)
     {
-        await Console.Out.WriteLineAsync(userName + " logged in");
+        return await _userService.GetUser(new() { Username = userName, Password = password });
     }
 
-    public async Task RegisterUser(string userName, string password)
+    public async Task<bool> RegisterUser(string userName, string password)
     {
-        await Console.Out.WriteLineAsync(userName + " registered");
+        return await _userService.RegisterNewUser(new() { Username = userName, Password = password, UserRole = UserRole.Registered });
     }
 
     public async Task Guest()
     {
-        await Console.Out.WriteLineAsync("Guest");
+        await _userService.RegisterNewUser(new() { Username = "Guest_" + Guid.NewGuid().ToString(), UserRole = UserRole.Guest });
     }
 }

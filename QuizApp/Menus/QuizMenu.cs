@@ -1,4 +1,5 @@
 ﻿using QuizApp.Enums;
+using QuizApp.Lib.Services;
 using QuizApp.Services;
 
 namespace QuizApp.Menus;
@@ -6,9 +7,9 @@ namespace QuizApp.Menus;
 internal class QuizMenu : IMenu
 {
     private readonly IMenuService _menuService;
-    private readonly QuizService _quizService;
+    private readonly IQuizService _quizService;
 
-    public QuizMenu(IMenuService menuService, QuizService quizService)
+    public QuizMenu(IMenuService menuService, IQuizService quizService)
     {
         _menuService = menuService;
         _quizService = quizService;
@@ -24,7 +25,7 @@ internal class QuizMenu : IMenu
             await Console.Out.WriteLineAsync();
             Console.Clear();
 
-            _menuService.PrintMenuItems(_quizService.QuizOptions());
+            _menuService.PrintMenuItems(["Eng Quiz - Hard", "Eng Quiz - Hard", "Swe Quiz - Normal", "Swe Quiz - Hard"]);
 
             var choice = _menuService.GetCharInput();
 
