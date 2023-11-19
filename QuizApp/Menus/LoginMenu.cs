@@ -1,14 +1,16 @@
-﻿using QuizApp.Enums;
+﻿using Microsoft.IdentityModel.Tokens;
+using QuizApp.Enums;
+using QuizApp.Lib.Models.Registrations;
 using QuizApp.Services;
 
 namespace QuizApp.Menus;
 
 internal class LoginMenu : IMenu
 {
-    private readonly IMenuService _menuService;
+    private readonly MenuService _menuService;
     private readonly LoginService _loginService;
 
-    public LoginMenu(IMenuService menuService, LoginService loginService)
+    public LoginMenu(MenuService menuService, LoginService loginService)
     {
         _menuService = menuService;
         _loginService = loginService;
@@ -32,10 +34,10 @@ internal class LoginMenu : IMenu
             switch (choice)
             {
                 case '1':
-                    validChoice = await _loginService.LoginUser("Kalle", "123"); // Hardcoded for simplicity in dev
+                    validChoice = await _loginService.LoginUser(); // Hardcoded for simplicity in dev
                     break;
                 case '2':
-                    validChoice = await _loginService.RegisterUser("Kalle", "123"); // Hardcoded for simplicity in dev
+                    validChoice = await _loginService.RegisterUser(); // Hardcoded for simplicity in dev
                     break;
                 case '3':
                     await _loginService.Guest();
@@ -47,6 +49,6 @@ internal class LoginMenu : IMenu
                 default:
                     break;
             }
-        }
+        } 
     }
 }

@@ -25,15 +25,19 @@ internal class Program
         services.AddScoped<UserMenu>();
         services.AddScoped<QuizMenu>();
         // Services
-        services.AddScoped<IMenuService, MenuService>();
+        services.AddScoped<MenuService>();
         services.AddScoped<LoginService>();
-        services.AddScoped<IQuizService, QuizService>();
         services.AddScoped<IUserService, UserService>();
+        services.AddScoped<IQuestionService, QuestionService>();
+        services.AddScoped<IQuizService, QuizService>();
         // Repositories
         services.AddScoped<IUserRepository, UserRepository>();
         services.AddScoped<IUserQuestionHistoryRepository, UserQuestionHistoryRepository>();
         services.AddScoped<IUserScoreRepository, UserScoreRepository>();
         services.AddScoped<IQuestionRepository, QuestionRepository>();
+        services.AddScoped<IAnswerRepository, AnswerRepository>();
+        services.AddScoped<IQuizAttemptRepository, QuizAttemptRepository>();
+        services.AddScoped<ICategoryRepository, CategoryRepository>();
 
         // Build
         var serviceProvider = services.BuildServiceProvider();

@@ -3,7 +3,7 @@ using System.Diagnostics;
 
 namespace QuizApp.Services;
 
-internal class MenuService : IMenuService
+internal class MenuService
 {
     public MenuService()
     {

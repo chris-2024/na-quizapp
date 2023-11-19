@@ -5,11 +5,11 @@ namespace QuizApp;
 
 internal class Application
 {
-    private readonly IMenuService _menuService;
+    private readonly MenuService _menuService;
     private readonly LoginMenu _loginMenu;
     private readonly MainMenu _mainMenu;
 
-    public Application(IMenuService menuService, LoginMenu loginMenu, MainMenu mainMenu)
+    public Application(MenuService menuService, LoginMenu loginMenu, MainMenu mainMenu)
     {
         _menuService = menuService;
         _loginMenu = loginMenu;

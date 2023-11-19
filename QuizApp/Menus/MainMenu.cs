@@ -7,15 +7,17 @@ namespace QuizApp.Menus;
 
 internal class MainMenu : IMenu
 {
-    private readonly IMenuService _menuService;
     private readonly IUserService _userService;
+    private readonly IQuizService _quizService;
+    private readonly MenuService _menuService;
     private readonly UserMenu _userMenu;
     private readonly QuizMenu _quizMenu;
 
-    public MainMenu(IMenuService menuService, IUserService userService, UserMenu userMenu, QuizMenu quizMenu)
+    public MainMenu(MenuService menuService, IUserService userService, IQuizService quizService, UserMenu userMenu, QuizMenu quizMenu)
     {
         _menuService = menuService;
         _userService = userService;
+        _quizService = quizService;
         _userMenu = userMenu;
         _quizMenu = quizMenu;
     }
@@ -24,7 +26,7 @@ internal class MainMenu : IMenu
 
     public async Task ShowAsync()
     {
-        while(!_menuService.ExitApp)
+        while(!_menuService.ExitApp && _userService.CurrentUser != null)
         {
             _menuService.CurrentMenu = MenuType.MainMenu;
 
@@ -39,12 +41,11 @@ internal class MainMenu : IMenu
             string loginLogoutOption = _userService.CurrentUser!.UserRole is UserRole.Registered ? "Logout" : "Login";
             _menuService.PrintMenuItems(_quizMenu.Title, _userMenu.Title, "Scoreboard", loginLogoutOption);
 
-            if (await MenuSelection(_menuService.GetCharInput()))
-                break;
+            await MenuSelection(_menuService.GetCharInput());
         }
     }
 
-    private async Task<bool> MenuSelection(char choice)
+    private async Task MenuSelection(char choice)
     {
         switch (choice)
         {
@@ -58,22 +59,21 @@ internal class MainMenu : IMenu
                 await ShowScores();
                 break;
             case '4':
-                return true;
+                _userService.CurrentUser = null;
+                break;
             case '0':
                 _menuService.ExitApp = true;
                 break;
             default:
                 break;
         }
-
-        return false;
     }
 
     private async Task ShowScores()
     {
         Console.Clear();
 
-        var scores = await _userService.GetAllUserScores();
+        var scores = await _quizService.GetAllUserScoresAsync();
 
         if (scores == null || scores.Count() <= 0)
             Console.WriteLine("No Scores");
@@ -83,7 +83,7 @@ internal class MainMenu : IMenu
 
             for (int i = 0; i < sortedScores!.Count; i++)
             {
-                Console.WriteLine($"#{i + 1} {sortedScores[i].User.Username} - {sortedScores[i].CorrectAnswers}");
+                Console.WriteLine($"#{i + 1} |{sortedScores[i].User?.Username ?? string.Empty}| Correct: {sortedScores[i].CorrectAnswers} | Incorrect: {sortedScores[i].IncorrectAnswers}");
             }
 
         }

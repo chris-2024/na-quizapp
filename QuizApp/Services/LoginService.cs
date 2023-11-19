@@ -1,4 +1,5 @@
 ﻿using QuizApp.Lib.Enums;
+using QuizApp.Lib.Models.Registrations;
 using QuizApp.Lib.Services;
 
 namespace QuizApp.Services;
@@ -12,18 +13,48 @@ internal class LoginService
         _userService = userService;
     }
 
-    public async Task<bool> LoginUser(string userName, string password)
+    public async Task<bool> LoginUser()
     {
-        return await _userService.GetUser(new() { Username = userName, Password = password });
+        var user = UserFieldsInput();
+
+        if (user == null) return false;
+
+        return await _userService.GetUserAsync(user);
     }
 
-    public async Task<bool> RegisterUser(string userName, string password)
+    public async Task<bool> RegisterUser()
     {
-        return await _userService.RegisterNewUser(new() { Username = userName, Password = password, UserRole = UserRole.Registered });
+        var user = UserFieldsInput();
+
+        if (user == null) return false;
+
+        user.UserRole = UserRole.Registered;
+
+        return await _userService.RegisterNewUserAsync(user);
     }
 
     public async Task Guest()
     {
-        await _userService.RegisterNewUser(new() { Username = "Guest_" + Guid.NewGuid().ToString(), UserRole = UserRole.Guest });
+        await _userService.RegisterNewUserAsync(new() { Username = "Guest_" + Guid.NewGuid().ToString(), UserRole = UserRole.Guest });
+    }
+
+    private UserRegistration UserFieldsInput()
+    {
+        var user = new UserRegistration();
+
+        Console.Clear();
+
+        Console.Write("Username: ");
+        user.Username = Console.ReadLine() ?? string.Empty;
+        Console.Write("Password: ");
+        user.Password = Console.ReadLine() ?? string.Empty;
+
+        if (string.IsNullOrWhiteSpace(user.Username) || string.IsNullOrWhiteSpace(user.Password))
+        {
+            Console.Write("\nInvalid input");
+            return null!;
+        }
+
+        return user;
     }
 }
