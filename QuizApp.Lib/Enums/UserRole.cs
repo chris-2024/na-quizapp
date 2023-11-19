@@ -2,7 +2,6 @@
 
 public enum UserRole
 {
-    None,
-    Registered,
+    Registered = 1,
     Guest
 }
