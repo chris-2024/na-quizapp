@@ -12,4 +12,15 @@ public class UserQuestionHistoryEntity
     public int QuestionID { get; set; }
     public QuestionEntity Question { get; set; } = null!;
     public DateTime AnsweredDate { get; set; }
+
+    public static implicit operator UserQuestionHistoryEntity(Question question)
+    {
+        return new UserQuestionHistoryEntity()
+        {
+            UserID = question.UserID,
+            QuestionID = question.QuestionID,
+            Question = question,
+            AnsweredDate = DateTime.Now.Date,
+        };
+    }
 }

@@ -5,6 +5,7 @@ namespace QuizApp.Lib.Models;
 
 public class User
 {
+    public int Id { get; set; }
     public string Username { get; set; } = null!;
     public UserRole UserRole { get; set; }
 
@@ -13,6 +14,7 @@ public class User
     {
         return new User()
         {
+            Id = user.UserID,
             Username = user.Username,
             UserRole = (UserRole)user.UserRoleID
         };

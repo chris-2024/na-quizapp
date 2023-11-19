@@ -1,11 +1,12 @@
 ﻿using QuizApp.Lib.Enums;
 using QuizApp.Lib.Models.Entities;
-using System.ComponentModel.DataAnnotations.Schema;
 
 namespace QuizApp.Lib.Models;
 
 public class Question
 {
+    public int QuestionID { get; set; }
+
     public string QuestionText { get; set; } = null!;
 
     public CategoryEntity Category { get; set; } = null!;
@@ -14,21 +15,22 @@ public class Question
 
     public Language Language { get; set; }
 
-    public UserEntity? User { get; set; }
+    public int UserID { get; set; }
 
     public List<AnswerEntity>? Answers { get; set; }
 
-    // Convert UserQuestionHistoryEntity to UserQuestionHistory
-    public static implicit operator Question(QuestionEntity questionHistory)
+    // Convert QuestionEntity to Question
+    public static implicit operator Question(QuestionEntity question)
     {
         return new Question()
         {
-            QuestionText = questionHistory.QuestionText,
-            Category = questionHistory.Category,
-            Difficulty = (Difficulty)questionHistory.DifficultyID,
-            Language = (Language)questionHistory.LanguageID,
-            User = questionHistory.User!,
-            Answers = new List<AnswerEntity>(questionHistory.Answers!)
+            QuestionID = question.QuestionID,
+            QuestionText = question.QuestionText,
+            Category = question.Category,
+            Difficulty = (Difficulty)question.DifficultyID,
+            Language = (Language)question.LanguageID,
+            UserID = question.UserID,
+            Answers = new List<AnswerEntity>(question.Answers!)
         };
     }
 }

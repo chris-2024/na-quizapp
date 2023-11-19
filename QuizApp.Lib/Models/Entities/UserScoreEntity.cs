@@ -11,4 +11,15 @@ public class UserScoreEntity
     public int CorrectAnswers { get; set; }
     public int IncorrectAnswers { get; set; }
     public DateTime LastScoredDate { get; set; }
+
+    public static implicit operator UserScoreEntity(QuizAttemptEntity quizAttempt)
+    {
+        return new UserScoreEntity()
+        {
+            UserID = quizAttempt.UserID,
+            CorrectAnswers = quizAttempt.CorrectAnswersCount,
+            IncorrectAnswers = quizAttempt.IncorrectAnswersCount,
+            LastScoredDate = DateTime.Now.Date
+        };
+    }
 }
