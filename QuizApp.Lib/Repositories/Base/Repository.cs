@@ -36,6 +36,13 @@ public abstract class Repository<TEntity> : IRepository<TEntity> where TEntity :
             var result = await _context.SaveChangesAsync();
             return result >= entities.Count();
         }
+        catch (DbUpdateException ex)
+        {
+            foreach (var entry in ex.Entries)
+            {
+                Debug.WriteLine($"Entity of type {entry.Entity.GetType().Name} in state {entry.State} could not be updated.");
+            }
+        }
         catch (Exception ex) { Debug.WriteLine(ex.Message); }
         return false;
     }
@@ -70,16 +77,27 @@ public abstract class Repository<TEntity> : IRepository<TEntity> where TEntity :
         return null!;
     }
 
-    public virtual async Task<bool> UpdateAsync(TEntity entity)
+    public virtual async Task<TEntity> UpdateAsync(TEntity entity)
     {
         try
         {
             _dbSet.Update(entity);
-            var result = await _context.SaveChangesAsync();
-            return result > 0;
+            await _context.SaveChangesAsync();
+            return entity;
+        }
+        catch (DbUpdateException ex)
+        {
+            Debug.WriteLine($"DbUpdateException: {ex.Message}");
+            // Print inner exception details
+            var innerException = ex.InnerException;
+            while (innerException != null)
+            {
+                Debug.WriteLine($"Inner Exception: {innerException.Message}");
+                innerException = innerException.InnerException;
+            }
         }
         catch (Exception ex) { Debug.WriteLine(ex.Message); }
-        return false;
+        return null!;
     }
 
     public virtual async Task<bool> DeleteAsync(TEntity entity)
@@ -89,6 +107,17 @@ public abstract class Repository<TEntity> : IRepository<TEntity> where TEntity :
             _dbSet.Remove(entity);
             var result = await _context.SaveChangesAsync();
             return result > 0;
+        }
+        catch (DbUpdateException ex)
+        {
+            Debug.WriteLine($"DbUpdateException: {ex.Message}");
+            // Print inner exception details
+            var innerException = ex.InnerException;
+            while (innerException != null)
+            {
+                Debug.WriteLine($"Inner Exception: {innerException.Message}");
+                innerException = innerException.InnerException;
+            }
         }
         catch (Exception ex) { Debug.WriteLine(ex.Message); }
         return false;
