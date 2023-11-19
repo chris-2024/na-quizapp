@@ -6,35 +6,29 @@ using QuizApp.Lib.Repositories;
 using System.Diagnostics;
 
 namespace QuizApp.Lib.Services;
-
-public interface IUserService
-{
-    User? CurrentUser { get; }
-    Task<bool> RegisterNewUser(UserRegistration user);
-    Task<bool> GetUser(UserRegistration user);
-    Task<bool> UpdateUser(UserRegistration user);
-    Task<IEnumerable<UserQuestionHistory>> GetAllUserQuestionHistory();
-    Task<bool> ClearUserQuestionHistory();
-    Task<IEnumerable<UserScoreEntity>> GetAllUserScores();
-}
 public class UserService : IUserService
 {
     private readonly IUserRepository userRepository;
     private readonly IUserQuestionHistoryRepository questionHistoryRepository;
     private readonly IUserScoreRepository userScoreRepository;
+    private readonly IQuizAttemptRepository quizAttemptRepository;
 
-    public UserService(IUserRepository userRepository, IUserQuestionHistoryRepository questionHistoryRepository, IUserScoreRepository userScoreRepository)
+    public UserService(IUserRepository userRepository, IUserQuestionHistoryRepository questionHistoryRepository, IUserScoreRepository userScoreRepository, IQuizAttemptRepository quizAttemptRepository)
     {
         this.userRepository = userRepository;
         this.questionHistoryRepository = questionHistoryRepository;
         this.userScoreRepository = userScoreRepository;
+        this.quizAttemptRepository = quizAttemptRepository;
     }
 
     // Currently logged in user
-    public User? CurrentUser { get; private set; }
+    public User? CurrentUser { get; set; }
+
+    // True if CurrentUser is registered
+    public bool IsRegistered => (CurrentUser != null && CurrentUser.UserRole is UserRole.Registered);
 
     // Register New User and set current user
-    public async Task<bool> RegisterNewUser(UserRegistration user)
+    public async Task<bool> RegisterNewUserAsync(UserRegistration user)
     {
         try
         {
@@ -48,7 +42,7 @@ public class UserService : IUserService
     }
 
     // Set current user
-    public async Task<bool> GetUser(UserRegistration user)
+    public async Task<bool> GetUserAsync(UserRegistration user)
     {
         try
         {
@@ -62,11 +56,48 @@ public class UserService : IUserService
     }
 
     // Update User
-    public async Task<bool> UpdateUser(UserRegistration user)
+    public async Task<(bool, string)> UpdateUserAsync(UserRegistration user)
     {
         try
         {
-            return await userRepository.UpdateAsync(user);
+            if (!IsRegistered)
+                return (false, "User not registered");
+
+            var existingUser = await userRepository.ReadAsync(u => u.Username == user.Username && u.UserID != CurrentUser!.Id);
+
+            if (existingUser != null)
+                return (false, "Username already exist");
+
+            var entity = await userRepository.ReadAsync(u => u.UserID == CurrentUser!.Id);
+
+            entity.Username = user.Username;
+            entity.Password = user.Password;
+
+            var updatedEntity = await userRepository.UpdateAsync(entity);
+
+            if (updatedEntity != null) CurrentUser = updatedEntity;
+            return (CurrentUser != null, "Updated");
+        }
+        catch (Exception ex) { Debug.WriteLine(ex.Message); }
+
+        return (false, "Failed to update");
+    }
+
+    // Remove User
+    public async Task<bool> RemoveUserAsync()
+    {
+        try
+        {
+            if (!IsRegistered)
+                return false;
+
+            var user = await userRepository.ReadAsync(u => u.UserID == CurrentUser!.Id);
+
+            var result = await userRepository.DeleteAsync(user);
+
+            if (result) CurrentUser = null;
+
+            return result;
         }
         catch (Exception ex) { Debug.WriteLine(ex.Message); }
 
@@ -74,14 +105,15 @@ public class UserService : IUserService
     }
 
     // Get question history for current user
-    public async Task<IEnumerable<UserQuestionHistory>> GetAllUserQuestionHistory()
+    public async Task<IEnumerable<UserQuestionHistory>> GetAllUserQuestionHistoryAsync()
     {
         try
         {
-            if (CurrentUser == null || CurrentUser.UserRole is UserRole.Guest)
+            if (!IsRegistered)
                 return null!;
 
-            return (await questionHistoryRepository.ReadRangeAsync(uq => uq.User.Username == CurrentUser.Username)).Select(entity => (UserQuestionHistory)entity);
+            var questions = (await questionHistoryRepository.ReadRangeAsync(uq => uq.UserID == CurrentUser!.Id)).Select(entity => (UserQuestionHistory)entity);
+            return questions;
         }
         catch (Exception ex) { Debug.WriteLine(ex.Message); }
 
@@ -89,75 +121,18 @@ public class UserService : IUserService
     }
 
     // Clear question history for current user
-    public async Task<bool> ClearUserQuestionHistory()
+    public async Task<bool> ClearUserQuestionHistoryAsync()
     {
         try
         {
-            if (CurrentUser == null || CurrentUser.UserRole is UserRole.Guest)
+            if (!IsRegistered)
                 return false;
 
-            return await questionHistoryRepository.DeleteRangeAsync(uq => uq.User.Username == CurrentUser.Username);
+            var result = await questionHistoryRepository.DeleteRangeAsync(uq => uq.UserID == CurrentUser!.Id);
+            return result;
         }
         catch (Exception ex) { Debug.WriteLine(ex.Message); }
 
         return false;
     }
-
-    public async Task<IEnumerable<UserScoreEntity>> GetAllUserScores()
-    {
-        try
-        {
-            return await userScoreRepository.ReadAllAsync() ?? null!;
-        }
-        catch (Exception ex) { Debug.WriteLine(ex.Message); }
-
-        return null!;
-    }
-}
-public interface IQuizService
-{
-
-}
-public class QuizService : IQuizService
-{
-    public QuizService(IUserService userService)
-    {
-
-    }
-
-    // Start Quiz - Difficulty/Category/Language
-
-    // Save QuizAttempt
-}
-public interface IQuestionService
-{
-
-}
-public class QuestionService : IQuestionService
-{
-    public QuestionService(UserService userService)
-    {
-
-    }
-
-    // Create new Question with Answers
-
-    // Get all questions created by user
-
-    // Get Questions - Difficulty/Category/Language - To use in quiz
-}
-public interface IUserQuestionHistoryService
-{
-
-}
-public class UserQuestionHistoryService : IUserQuestionHistoryService
-{
-    public UserQuestionHistoryService()
-    {
-
-    }
-
-    // Addrange questionhistories
-
-    // Clear History
 }
