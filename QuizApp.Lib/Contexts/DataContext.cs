@@ -31,6 +31,17 @@ public class DataContext : DbContext
         modelBuilder.Entity<UserQuestionHistoryEntity>()
             .HasKey(uq => new { uq.UserID, uq.QuestionID });
 
+        modelBuilder.Entity<UserQuestionHistoryEntity>()
+            .HasOne(uqh => uqh.Question)
+            .WithMany()
+            .HasForeignKey(uqh => uqh.QuestionID)
+            .OnDelete(DeleteBehavior.NoAction);
+
+        modelBuilder.Entity<UserQuestionHistoryEntity>()
+            .HasOne(uq => uq.User)
+            .WithMany()
+            .HasForeignKey(uq => uq.UserID);
+
         // Seed UserRoles
         modelBuilder.Entity<UserRoleEntity>().HasData(
             new UserRoleEntity { UserRoleID = 1, RoleName = "Registered" },

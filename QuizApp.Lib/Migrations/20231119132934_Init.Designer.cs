@@ -12,8 +12,8 @@ using QuizApp.Lib.Contexts;
 namespace QuizApp.Lib.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20231119001725_SeedData")]
-    partial class SeedData
+    [Migration("20231119132934_Init")]
+    partial class Init
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -173,7 +173,7 @@ namespace QuizApp.Lib.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("UserID")
+                    b.Property<int>("UserID")
                         .HasColumnType("int");
 
                     b.HasKey("QuestionID");
@@ -346,7 +346,9 @@ namespace QuizApp.Lib.Migrations
 
                     b.HasOne("QuizApp.Lib.Models.Entities.UserEntity", "User")
                         .WithMany()
-                        .HasForeignKey("UserID");
+                        .HasForeignKey("UserID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Category");
 
@@ -384,7 +386,7 @@ namespace QuizApp.Lib.Migrations
                     b.HasOne("QuizApp.Lib.Models.Entities.QuestionEntity", "Question")
                         .WithMany()
                         .HasForeignKey("QuestionID")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.HasOne("QuizApp.Lib.Models.Entities.UserEntity", "User")

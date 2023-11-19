@@ -170,7 +170,7 @@ namespace QuizApp.Lib.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("UserID")
+                    b.Property<int>("UserID")
                         .HasColumnType("int");
 
                     b.HasKey("QuestionID");
@@ -343,7 +343,9 @@ namespace QuizApp.Lib.Migrations
 
                     b.HasOne("QuizApp.Lib.Models.Entities.UserEntity", "User")
                         .WithMany()
-                        .HasForeignKey("UserID");
+                        .HasForeignKey("UserID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Category");
 
@@ -381,7 +383,7 @@ namespace QuizApp.Lib.Migrations
                     b.HasOne("QuizApp.Lib.Models.Entities.QuestionEntity", "Question")
                         .WithMany()
                         .HasForeignKey("QuestionID")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.HasOne("QuizApp.Lib.Models.Entities.UserEntity", "User")

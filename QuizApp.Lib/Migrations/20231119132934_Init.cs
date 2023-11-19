@@ -3,6 +3,8 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
+#pragma warning disable CA1814 // Prefer jagged arrays over multidimensional
+
 namespace QuizApp.Lib.Migrations
 {
     /// <inheritdoc />
@@ -94,7 +96,7 @@ namespace QuizApp.Lib.Migrations
                     CategoryID = table.Column<int>(type: "int", nullable: false),
                     DifficultyID = table.Column<int>(type: "int", nullable: false),
                     LanguageID = table.Column<int>(type: "int", nullable: false),
-                    UserID = table.Column<int>(type: "int", nullable: true)
+                    UserID = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -121,7 +123,8 @@ namespace QuizApp.Lib.Migrations
                         name: "FK_Questions_Users_UserID",
                         column: x => x.UserID,
                         principalTable: "Users",
-                        principalColumn: "UserID");
+                        principalColumn: "UserID",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -203,14 +206,52 @@ namespace QuizApp.Lib.Migrations
                         name: "FK_UserQuestionHistories_Questions_QuestionID",
                         column: x => x.QuestionID,
                         principalTable: "Questions",
-                        principalColumn: "QuestionID",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "QuestionID");
                     table.ForeignKey(
                         name: "FK_UserQuestionHistories_Users_UserID",
                         column: x => x.UserID,
                         principalTable: "Users",
                         principalColumn: "UserID",
                         onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.InsertData(
+                table: "Categories",
+                columns: new[] { "CategoryID", "CategoryName" },
+                values: new object[,]
+                {
+                    { 1, "C#" },
+                    { 2, "Fruits" },
+                    { 3, "Potatoes" },
+                    { 4, "Technology" },
+                    { 5, "Other" }
+                });
+
+            migrationBuilder.InsertData(
+                table: "Difficulties",
+                columns: new[] { "DifficultyID", "DifficultyName" },
+                values: new object[,]
+                {
+                    { 1, "Normal" },
+                    { 2, "Hard" }
+                });
+
+            migrationBuilder.InsertData(
+                table: "Languages",
+                columns: new[] { "LanguageID", "LanguageName" },
+                values: new object[,]
+                {
+                    { 1, "English" },
+                    { 2, "Swedish" }
+                });
+
+            migrationBuilder.InsertData(
+                table: "UserRoles",
+                columns: new[] { "UserRoleID", "RoleName" },
+                values: new object[,]
+                {
+                    { 1, "Registered" },
+                    { 2, "Guest" }
                 });
 
             migrationBuilder.CreateIndex(
