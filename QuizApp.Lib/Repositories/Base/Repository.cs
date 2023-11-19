@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using QuizApp.Lib.Contexts;
 using System.Diagnostics;
 using System.Linq.Expressions;
 
@@ -9,37 +10,37 @@ public abstract class Repository<TEntity> : IRepository<TEntity> where TEntity :
     private readonly DbContext _context;
     private readonly DbSet<TEntity> _dbSet;
 
-    public Repository(DbContext context)
+    protected Repository(DataContext context)
     {
         _context = context;
         _dbSet = _context.Set<TEntity>();
     }
 
-    public async Task<bool> CreateAsync(TEntity entity)
+    public virtual async Task<TEntity> CreateAsync(TEntity entity)
     {
         try
         {
             await _dbSet.AddAsync(entity);
-            var result = await _context.SaveChangesAsync();
-            return result > 0;
+            await _context.SaveChangesAsync();
+            return entity ?? null!;
         }
         catch (Exception ex) { Debug.WriteLine(ex.Message); }
-        return false;
+        return null!;
     }
 
-    public async Task<bool> CreateRangeAsync(IEnumerable<TEntity> entities)
+    public virtual async Task<bool> CreateRangeAsync(IEnumerable<TEntity> entities)
     {
         try
         {
             await _dbSet.AddRangeAsync(entities);
             var result = await _context.SaveChangesAsync();
-            return result > 0;
+            return result >= entities.Count();
         }
         catch (Exception ex) { Debug.WriteLine(ex.Message); }
         return false;
     }
 
-    public async Task<TEntity> ReadAsync(Expression<Func<TEntity, bool>> predicate)
+    public virtual async Task<TEntity> ReadAsync(Expression<Func<TEntity, bool>> predicate)
     {
         try
         {
@@ -49,7 +50,7 @@ public abstract class Repository<TEntity> : IRepository<TEntity> where TEntity :
         return null!;
     }
 
-    public async Task<IEnumerable<TEntity>> ReadRangeAsync(Expression<Func<TEntity, bool>> predicate)
+    public virtual async Task<IEnumerable<TEntity>> ReadRangeAsync(Expression<Func<TEntity, bool>> predicate)
     {
         try
         {
@@ -59,7 +60,7 @@ public abstract class Repository<TEntity> : IRepository<TEntity> where TEntity :
         return null!;
     }
 
-    public async Task<IEnumerable<TEntity>> ReadAllAsync()
+    public virtual async Task<IEnumerable<TEntity>> ReadAllAsync()
     {
         try
         {
@@ -69,7 +70,7 @@ public abstract class Repository<TEntity> : IRepository<TEntity> where TEntity :
         return null!;
     }
 
-    public async Task<bool> UpdateAsync(TEntity entity)
+    public virtual async Task<bool> UpdateAsync(TEntity entity)
     {
         try
         {
@@ -81,11 +82,39 @@ public abstract class Repository<TEntity> : IRepository<TEntity> where TEntity :
         return false;
     }
 
-    public async Task<bool> DeleteAsync(TEntity entity)
+    public virtual async Task<bool> DeleteAsync(TEntity entity)
     {
         try
         {
             _dbSet.Remove(entity);
+            var result = await _context.SaveChangesAsync();
+            return result > 0;
+        }
+        catch (Exception ex) { Debug.WriteLine(ex.Message); }
+        return false;
+    }
+
+    public virtual async Task<bool> DeleteRangeAsync(IEnumerable<TEntity> entities)
+    {
+        try
+        {
+            _dbSet.RemoveRange(entities);
+            var result = await _context.SaveChangesAsync();
+            return result > 0;
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine(ex.Message);
+        }
+        return false;
+    }
+
+    public virtual async Task<bool> DeleteRangeAsync(Expression<Func<TEntity, bool>> predicate)
+    {
+        try
+        {
+            var entities = await _dbSet.Where(predicate).ToListAsync();
+            _dbSet.RemoveRange(entities);
             var result = await _context.SaveChangesAsync();
             return result > 0;
         }
