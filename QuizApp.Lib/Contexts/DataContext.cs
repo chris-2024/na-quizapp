@@ -30,5 +30,32 @@ public class DataContext : DbContext
         // Composite key: UserId and QuestionId
         modelBuilder.Entity<UserQuestionHistoryEntity>()
             .HasKey(uq => new { uq.UserID, uq.QuestionID });
+
+        // Seed UserRoles
+        modelBuilder.Entity<UserRoleEntity>().HasData(
+            new UserRoleEntity { UserRoleID = 1, RoleName = "Registered" },
+            new UserRoleEntity { UserRoleID = 2, RoleName = "Guest" }
+        );
+
+        // Seed Categories
+        modelBuilder.Entity<CategoryEntity>().HasData(
+            new CategoryEntity { CategoryID = 1, CategoryName = "C#" },
+            new CategoryEntity { CategoryID = 2, CategoryName = "Fruits" },
+            new CategoryEntity { CategoryID = 3, CategoryName = "Potatoes" },
+            new CategoryEntity { CategoryID = 4, CategoryName = "Technology" },
+            new CategoryEntity { CategoryID = 5, CategoryName = "Other" }
+        );
+
+        // Seed Difficulties
+        modelBuilder.Entity<DifficultyEntity>().HasData(
+            new DifficultyEntity { DifficultyID = 1, DifficultyName = "Normal" },
+            new DifficultyEntity { DifficultyID = 2, DifficultyName = "Hard" }
+        );
+
+        // Seed Languages
+        modelBuilder.Entity<LanguageEntity>().HasData(
+            new LanguageEntity { LanguageID = 1, LanguageName = "English" },
+            new LanguageEntity { LanguageID = 2, LanguageName = "Swedish" }
+        );
     }
 }
