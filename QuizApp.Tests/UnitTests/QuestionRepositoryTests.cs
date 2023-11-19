@@ -1,12 +1,7 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Query;
-using Moq;
-using QuizApp.Lib.Contexts;
+﻿using Moq;
 using QuizApp.Lib.Models.Entities;
 using QuizApp.Lib.Repositories;
-using System;
 using System.Linq.Expressions;
-using Xunit;
 
 namespace QuizApp.Tests.UnitTests;
 
@@ -66,7 +61,7 @@ public class QuestionRepositoryTests
     {
         new QuestionEntity { QuestionID = 1, QuestionText = "Question 1", Answers = new List<AnswerEntity>() },
         new QuestionEntity { QuestionID = 2, QuestionText = "Question 2", Answers = new List<AnswerEntity>() },
-        // Add more test data as needed
+
     };
 
         var mockQuestionRepository = new Mock<IQuestionRepository>();
